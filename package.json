@@ -1,5 +1,5 @@
 {
-  "name": "ci-cd-node",
+  "name": "example-ci-cd",
   "version": "1.0.0",
   "description": "Node.js project with CI/CD using GitHub Actions",
   "main": "app.js",
