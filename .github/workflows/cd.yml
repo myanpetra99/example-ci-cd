@@ -23,7 +23,7 @@ jobs:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
         port: ${{ secrets.SSH_PORT }}
-        password: ${{ secrets.g }}
+        password: ${{ secrets.SSH_PASSWORD }}
         script: |
           if [ -d "node/example-ci-cd" ]; then
              # If the directory exists, it's potentially a cloned repository. Check if it's a Git repository.
