@@ -7,38 +7,47 @@ on:
 
 jobs:
   deploy:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-      - name: Install production dependencies
-        run: npm install --only=production
-      - name: SSH and Deploy to server
-        run: |
-          echo "Deploying to server..."
-          ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_PASSWORD }} 'if exist "node/example-ci-cd" ( 
+    - uses: actions/checkout@v2
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+    - name: Install production dependencies
+      run: npm install --only=production
+    - name: SSH and Deploy to server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        port: ${{ secrets.SSH_PORT }}
+        password: ${{ secrets.SSH_PASSWORD }}
+        script: |
+          if [ -d "node/example-ci-cd" ]; then
+             # If the directory exists, it's potentially a cloned repository. Check if it's a Git repository.
             cd node/example-ci-cd
-            if exist ".git" (
-              git pull origin main
+            if [ -d ".git" ]; then
+             # If .git directory exists, it's a Git repository. Pull the latest changes.
+             git pull origin main
+             npm install
+             pm2 restart all
+            else
+            # If not, it's not a proper repository. Clean up and re-clone.
+             cd ..
+             rm -rf example-ci-cd
+             git clone https://github.com/myanpetra99/example-ci-cd.git
+             cd example-ci-cd
               npm install
-              pm2 restart all
-            ) else (
-              cd ..
-              rmdir /s /q example-ci-cd
-              git clone https://github.com/myanpetra99/example-ci-cd.git
-              cd example-ci-cd
-              npm install
-              npm run start
-            )
-          ) else (
-            mkdir node
+            npm run start
+            fi
+          else
+            # If the directory doesn't exist, create the necessary directories, clone, and start the project.
+            mkdir -p node
             cd node
             git clone https://github.com/myanpetra99/example-ci-cd.git example-ci-cd
             cd example-ci-cd
             npm install
             npm run start
-          )'
+          fi
