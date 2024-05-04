@@ -46,7 +46,7 @@ jobs:
             # If the directory doesn't exist, create the necessary directories, clone, and start the project.
             mkdir -p node
             cd node
-            git clone https://github.com/myanpetra99/example-ci-cd.git example-ci-cd
+            git clone https://github.com/myanpetra99/example-ci-cd.git
             cd example-ci-cd
             npm install
             npm run start
