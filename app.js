@@ -4,7 +4,8 @@ const app = express();
 app.get('/', (req, res) => {
 
     if (req.query.name) {
-        return res.send(`Hello ${req.query.name}!`);
+        const capitalized = req.query.name.toUpperCase();
+        return res.send(`Hello ${capitalized}!`);
     }
  
     res.send('Hello World!');
